@@ -3,9 +3,9 @@ const router = express.Router();
 const {isAuthenticated} = require ('../middlewares/isAuthenticated')
 const upload = require('../middlewares/multer')
 const {getAllProducts,getSingleProduct,createProduct,deleteProduct,
-    updateProduct,getProductByCategory} = require('../controllers/productsController');
+    updateProduct,getProductByCategory,queriesfunctionality} = require('../controllers/productsController');
 
-router.get('/category',getProductByCategory) 
+router.get('/',queriesfunctionality) 
 
 router.route('/:id')
     .get(getSingleProduct)
@@ -13,7 +13,6 @@ router.route('/:id')
     .delete(isAuthenticated,deleteProduct)
 
 router.route('/')
-.get(getAllProducts)
 .post(isAuthenticated,upload,createProduct)
 
 

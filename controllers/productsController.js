@@ -95,16 +95,61 @@ exports.deleteProduct = async (req,res) => {
     }
 }
 
-exports.getProductByCategory = async (req, res) => {
-    try {
-        const  {category}  = req.query;
-        console.log(category);
-        const products = await Product.find({category});
+// exports.getProductByCategory = async (req, res) => {
+//     try {
+//         const  {category}  = req.query;
+//         console.log(category);
+//         const products = await Product.find({category});
+//         res.json({
+//             data: products
+//         });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ message: 'Server error' });
+//     }
+// }
+
+exports.queriesfunctionality = async (req, res) => {
+    // Destructure query parameters
+    try{
+    const { category, sortBy, order, search, minPrice, maxPrice, page, limit } = req.query;
+
+    
+    if (category) {
+        const products = await Product.find({ category });
         res.json({
             data: products
         });
-    } catch (err) {
+    } else if (sortBy && order) {
+        if (['asc', 'desc'].includes(order)) {
+            const products = await Product.find().sort({ [sortBy]: order }).exec();
+            res.json({
+                data: products
+            });
+        } else {
+            res.status(400).json({ error: 'Invalid order value. Use "asc" or "desc"' });
+        }
+    }else if (minPrice && maxPrice) {
+        const products = await Product.find({ price: { $gte: minPrice, $lte: maxPrice } });
+        res.json({
+            data: products
+        });
+    }else if (page && limit){
+        const products = await Product.find().skip((page - 1) * limit).limit(limit).exec();
+        res.json({
+            data: products
+        });
+    }else if (search){
+        const products = await Product.find({ title: { $regex: search, $options: 'i' } });
+        res.json({
+            data: products
+        })
+    }else{
+        res.satuts(400).json({ error: 'Invalid order values' })
+    }
+} catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
     }
+    
 }
