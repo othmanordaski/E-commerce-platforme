@@ -1,7 +1,7 @@
 const {hashPassword,comparePassword} = require('../helpers/hashing')
 const {generateJwtToken,verifyJwtToken}= require('../helpers/jsonWebToken')
 const User = require('../models/schemas/userSchema')
-// const {sendMailRegister} = require('../helpers/nodemailer')
+const {sendMailRegister} = require('../helpers/nodemailer')
 
 
 
@@ -13,7 +13,6 @@ exports.login = async (req, res) => {
     try {
         // Find the user by username
         const user = await User.findOne({ username });
-        delete user.password;
         // console.log(user);
         if (user) {
              const checked = await comparePassword(password, user.password);
@@ -69,6 +68,7 @@ exports.registerUser = async (req, res) => {
 
         // Save the new user to the database
         const result = await newUser.save();
+        await sendMailRegister(newUser.username, newUser.email)
 
         // Respond with JSON containing the saved user data
         res.json({
