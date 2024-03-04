@@ -1,5 +1,5 @@
 const User = require('../models/schemas/userSchema'); 
-const {hashPassword} = require('../helpers/hashing')
+const {hashPassword,comparePassword} = require('../helpers/hashing')
 
 exports.getCurrentProfile = async (req, res) => {
     try {
@@ -28,8 +28,15 @@ exports.updateCurrentProfile = async (req,res) => {
         const {filename} = req.file
         // Retrieve User informations from the request body
         const { username, email, password, gender, age, country, phoneNumber } = req.body;
+        const userfound = await User.findById(id)
+        console.log(userfound)
         // Hash the password
-        const hashedPassword = await hashPassword(password);
+        const checked =  await comparePassword(password, userfound.password)
+        console.log(checked)
+        if (checked) {
+            return res.status(404).json({ message: 'u can change ur password with ancient pass' });
+        }else{
+        const hashedPassword = await hashPassword(password)
         //update the current profile
         const user = await User.updateOne({_id : id},{ username,
              email, 
@@ -42,7 +49,7 @@ exports.updateCurrentProfile = async (req,res) => {
         res.json({
             data: user
         });
-        
+    }
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });

@@ -7,7 +7,7 @@ const upload = require('../middlewares/multer')
 
 router.route('/')
 .get(isAuthenticated,getCurrentProfile)
-.put(isAuthenticated,upload,updateCurrentProfile)
+.patch(isAuthenticated,upload,updateCurrentProfile)
 .delete(isAuthenticated,deleteCurrentProfile)
 
 module.exports = router;
